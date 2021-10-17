@@ -1,14 +1,11 @@
 <?php
-namespace Xitoid\Xo;
+namespace Xitoid\Canimasi;
 
 class Animasi
 {
-  private $durasi;
-  private $awal;
-  private $akhir;
-  private $animasi;
-  private $random;
   private $teks;
+  private $durasi;
+  private $animasi;
   
   public function __construct()
   {
@@ -17,38 +14,37 @@ class Animasi
     $this->isiAnimasi("nulis");
   }
   
-  public function isiDurasi($durasi1, $durasi2 = 0)
+  public function __destruct()
+  {
+    $this->tampilinKursor();
+  }
+  
+  public function isiDurasi(int $durasi1,int $durasi2 = 0)
   {
     if($durasi2 == 0)
     {
-      $this->durasi = $durasi1;
-      $this->random = false;
-      unset($this->awal, $this->akhir);
+      $this->durasi = array($durasi1);
     } else {
-      $this->random = true;
-      $this->awal   = $durasi1;
-      $this->akhir  = $durasi2;
+      $this->durasi = array($durasi1, $durasi2);
     }
+    return $this;
   }
   
-  public function isiTeks($teks)
+  public function isiTeks(string $teks)
   {
     $this -> teks = $teks;
+    return $this;
   }
   
-  public function isiAnimasi($animasi)
+  public function isiAnimasi(string $animasi)
   {
     $this -> animasi = $animasi;
+    return $this;
   }
   
   public function lihatDurasi()
   {
-    if($this->random == false)
-    {
-      return $this->durasi;
-    }
-    
-    return $this->awal.", ".$this->akhir;
+    return $this->durasi;
   }
   
   public function lihatTeks()
@@ -56,25 +52,64 @@ class Animasi
     return $this -> teks;
   }
   
-  public function tampilkan()
+  public function lihatAnimasi($opsional = "")
   {
+    $animasi = "Xitoid\Canimasi\Animasi"
+      .ucfirst($this->animasi);
     
-  }
-}
-
-class JalankanAnimasi
-{
-  private $durasi;
-  private $animasi;
-  private $teks;
-  
-  public function __construct($durasi, $animasi, $teks)
-  {
+    if(!class_exists($animasi))
+    {
+      echo "\nAnimasi ".$this->animasi." tidak tersedia.\n";
+    } else {
+      $animasi::start($this->lihatDurasi(), $this->lihatTeks(), $opsional);
+    }
     
+    return $this;
   }
   
-  private function nulis()
+  public function jeda(int $sleep)
   {
-    
+    // 1 seconds == 1 000 000 miliseconds
+    usleep($sleep);
+    return $this;
+  }
+  
+  public function hapus(int $jumlahHapus, int $durasi = 50000)
+  {
+    for($i = 0; $i < $jumlahHapus; $i++)
+    {
+      if($i == 0)
+      {
+        $n = 1;
+      } else {
+        $n = 2;
+      }
+      
+      echo "\033[".$n."D ";
+      if($i == $jumlahHapus - 1)
+      {
+        echo "\033[1D";
+      }
+      usleep($durasi);
+    }
+    return $this;
+  }
+  
+  public function hapusLine()
+  {
+    echo "\033[1K\r";
+    return $this;
+  }
+  
+  public function umpetinKursor()
+  {
+    echo "\033[?25l";
+    return $this;
+  }
+  
+  public function tampilinKursor()
+  {
+    echo "\033[?25h";
+    return $this;
   }
 }
